@@ -39,9 +39,9 @@ def operation_to_message(op)
   operation
 end
 
-#english
+# english
 prompt(messages('welcome', 'en'))
-#spanish
+# spanish
 prompt(messages('welcome', 'es'))
 
 name = ""
