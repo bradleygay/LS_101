@@ -1,0 +1,26 @@
+# reorganizing the calculator_messages.yml
+
+en:
+  welcome: "Welcome to Calculator! Enter your name:"
+  valid_name: "Make sure to enter a valid name."
+es:
+  welcome: "Bienvenido a la calculadora! Entre su nombre:"
+  valid_name: "Asegúrese de entrar un nombre válido."
+
+
+# calculator_messages.yml
+
+welcome: "Welcome to Calculator! Please enter your name: "
+valid_name: "Please use a valid name."
+first_number: "What is your first number?"
+invalid_number: "The input provided is not a valid number."
+second_number: "What is your second number?"
+invalid_operator: "Must choose 1, 2, 3, or 4."
+again: "Would you like to perform another operation? (Y to calculate again)"
+goodbye: "Thank you for using Calculator. Goodbye."
+operator_prompt: |
+  What operation would you like to perform?
+  1) Add
+  2) Subtract
+  3) Multiply
+  4) Divide
