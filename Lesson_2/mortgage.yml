@@ -1,0 +1,28 @@
+# reorganizing the mortgage.yml
+
+en:
+  welcome: "Hello! Welcome to the Mortgage Calculator. Please enter your name: "
+  valid_name: "Please enter a valid name: "
+es:
+  welcome: "Hola! Bienvenido a la Calculadora de Hipoteca! Por favor, entre su nombre: "
+  valid_name: "Por favor entrar un nombre válido: "
+
+
+# mortgage.yml
+
+welcome: "Hello! Welcome to the Mortgage Calculator. Please enter your name: "
+valid_name: "Please enter a valid name: "
+request: "What loan amount are you requesting for your mortgage today?"
+valid_number: "Please enter a valid numerical value."
+duration: |
+  Great. And, what duration did you want this financing to continue?
+  30) 30-Year
+  20) 20-Year
+  15) 15-Year
+time_valid: |
+  Please enter a valid numerical value.
+  30) 30-Year
+  20) 20-Year
+  15) 15-Year
+again: "Would you like to continue with a different request? (Y to continue)"
+goodbye: "Thank you for stopping by. Have a magical day!"
