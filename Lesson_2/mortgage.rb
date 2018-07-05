@@ -13,29 +13,44 @@ def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
-def valid_number?(num)
-  num.to_i().to_s() == num
+def valid_integer?(num)
+  Integer(num)
 end
 
-def monthly_mortgage(x, y, z)
-  x * (y / (1 - (1 + y)**(-z * 12)))
+def valid_positive_integer?(num)
+  valid_integer?(num) && num.to_i() >= 0
 end
 
-def number?(input)
-  input.to_f.to_s() == input
+def valid_float?(num)
+  Float(num)
 end
 
-# Y
-# Monthly Rate = APR / 12
-thirty_year_mr = 0.04706 / 12
-twenty_year_mr = 0.04571 / 12
-fifteen_year_mr = 0.04371 / 12
+def valid_positive_float?(num)
+  valid_float?(num) && num.to_f() >= 0.00
+end
+
+def valid_loan_amount?(num)
+  valid_positive_float?(num)
+end
+
+def valid_time?(num)
+  valid_positive_integer?(num)
+end
+
+def valid_apr?(num)
+  valid_positive_float?(num) && num.to_f <= 100.00
+end
+
+# --------------------------------------------------------
 
 # English
-prompt(messages('welcome', 'en'))
+prompt(messages('welcome','en'))
 # Spanish
-prompt(messages('welcome', 'es'))
+prompt(messages('welcome','es'))
 
+# --------------------------------------------------------
+
+prompt(MESSAGES['name'])
 name = ""
 loop do
   name = Kernel.gets().chomp()
@@ -45,48 +60,56 @@ loop do
     break
   end
 end
-
 prompt("Hello, #{name}!")
 
-loop do
-  prompt(MESSAGES['request'])
+# --------------------------------------------------------
 
-  # X
-  loan = ""
+loop do
+
+  prompt(MESSAGES['loan_request'])
+  loan_request = ""
   loop do
-    loan = Kernel.gets().chomp()
-    if valid_number?(loan)
-      break
-    elsif number?(loan)
-      break
-    else
+    loan_request = Kernel.gets().chomp()
+    if loan_request.empty?()
       prompt(MESSAGES['valid_number'])
+    else valid_loan_amount?(loan_request)
+      break
     end
   end
 
   prompt(MESSAGES['duration'])
-
-  # Z
   time = ""
   loop do
     time = Kernel.gets().chomp()
-    if %w(30 20 15).include?(time)
+    if time.empty?()
+      prompt(MESSAGES['valid_number'])
+    else valid_time?(time)
       break
-    else
-      prompt(MESSAGES['time_valid'])
     end
   end
 
-  result = case time
-           when '30'
-             monthly_mortgage(loan.to_f(), thirty_year_mr.to_f(), time.to_f())
-           when '20'
-             monthly_mortgage(loan.to_f(), twenty_year_mr.to_f(), time.to_f())
-           when '15'
-             monthly_mortgage(loan.to_f(), fifteen_year_mr.to_f(), time.to_f())
-           end
+  prompt(MESSAGES['apr_request'])
+  apr = ""
+  loop do
+    apr = Kernel.gets().chomp()
+    if apr.empty?()
+      prompt(MESSAGES['valid_apr'])
+    else valid_apr?(apr)
+      break
+    end
+  end
 
-  prompt("Wonderful. Your monthly mortgage payment will be $#{result.round(2)}.")
+  months = time.to_i() * 12
+  monthly = (apr.to_f() / 100) / 12
+
+# m = p * (j / (1 - (1 + j)**(-n)))
+# monthly payment = loan amount * (MIR / (1 - (1 + MIR)**(-duration)))
+
+  first_calculation = (1 + monthly)**(-months)
+  second_calculation = monthly / (1 - first_calculation)
+  third_calculation = loan_request.to_f() * second_calculation
+
+  prompt("Wonderful. Your monthly mortgage payment will be %0.2f" % [third_calculation])
 
   prompt(MESSAGES['again'])
   answer = Kernel.gets().chomp()
