@@ -13,6 +13,10 @@ def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
+def valid_number?(num)
+  num.to_i().to_s() == num || num.to_f().to_s() == num
+end
+
 def valid_integer?(num)
   Integer(num)
 end
@@ -30,15 +34,27 @@ def valid_positive_float?(num)
 end
 
 def valid_loan_amount?(num)
-  valid_positive_float?(num)
+  if valid_number?(num) && valid_positive_float?(num)
+    true
+  else
+    prompt(MESSAGES['valid_number'])
+  end
 end
 
 def valid_time?(num)
-  valid_positive_integer?(num)
+  if valid_number?(num) && valid_positive_integer?(num)
+    true
+  else
+    prompt(MESSAGES['valid_number'])
+  end
 end
 
 def valid_apr?(num)
-  valid_positive_float?(num) && num.to_f <= 100.00
+  if valid_number?(num) && valid_positive_float?(num) && num.to_f <= 100.00
+    true
+  else
+    prompt(MESSAGES['valid_apr'])
+  end
 end
 
 # --------------------------------------------------------
