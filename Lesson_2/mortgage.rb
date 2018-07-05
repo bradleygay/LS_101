@@ -44,9 +44,9 @@ end
 # --------------------------------------------------------
 
 # English
-prompt(messages('welcome','en'))
+prompt(messages('welcome', 'en'))
 # Spanish
-prompt(messages('welcome','es'))
+prompt(messages('welcome', 'es'))
 
 # --------------------------------------------------------
 
@@ -65,14 +65,13 @@ prompt("Hello, #{name}!")
 # --------------------------------------------------------
 
 loop do
-
   prompt(MESSAGES['loan_request'])
   loan_request = ""
   loop do
     loan_request = Kernel.gets().chomp()
     if loan_request.empty?()
       prompt(MESSAGES['valid_number'])
-    else valid_loan_amount?(loan_request)
+    elsif valid_loan_amount?(loan_request)
       break
     end
   end
@@ -83,7 +82,7 @@ loop do
     time = Kernel.gets().chomp()
     if time.empty?()
       prompt(MESSAGES['valid_number'])
-    else valid_time?(time)
+    elsif valid_time?(time)
       break
     end
   end
@@ -94,7 +93,7 @@ loop do
     apr = Kernel.gets().chomp()
     if apr.empty?()
       prompt(MESSAGES['valid_apr'])
-    else valid_apr?(apr)
+    elsif valid_apr?(apr)
       break
     end
   end
@@ -102,14 +101,14 @@ loop do
   months = time.to_i() * 12
   monthly = (apr.to_f() / 100) / 12
 
-# m = p * (j / (1 - (1 + j)**(-n)))
-# monthly payment = loan amount * (MIR / (1 - (1 + MIR)**(-duration)))
+  # m = p * (j / (1 - (1 + j)**(-n)))
+  # monthly payment = loan amount * (MIR / (1 - (1 + MIR)**(-duration)))
 
-  first_calculation = (1 + monthly)**(-months)
+  first_calculation = (1 + monthly)**-months
   second_calculation = monthly / (1 - first_calculation)
   third_calculation = loan_request.to_f() * second_calculation
 
-  prompt("Wonderful. Your monthly mortgage payment will be %0.2f" % [third_calculation])
+  prompt(MESSAGES['result'] + format('%0.2f', third_calculation) + ".")
 
   prompt(MESSAGES['again'])
   answer = Kernel.gets().chomp()
