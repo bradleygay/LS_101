@@ -13,18 +13,6 @@ def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
-def valid_number?(num)
-  num.to_i().to_s() == num || num.to_f().to_s() == num
-end
-
-def valid_integer?(num)
-  Integer(num)
-end
-
-def valid_positive_integer?(num)
-  valid_integer?(num) && num.to_i() >= 0
-end
-
 def valid_float?(num)
   Float(num)
 end
@@ -34,26 +22,29 @@ def valid_positive_float?(num)
 end
 
 def valid_loan_amount?(num)
-  if valid_number?(num) && valid_positive_float?(num)
+  if valid_positive_float?(num)
     true
   else
     prompt(MESSAGES['valid_number'])
+    false
   end
 end
 
 def valid_time?(num)
-  if valid_number?(num) && valid_positive_integer?(num)
+  if valid_positive_float?(num)
     true
   else
     prompt(MESSAGES['valid_number'])
+    false
   end
 end
 
 def valid_apr?(num)
-  if valid_number?(num) && valid_positive_float?(num) && num.to_f <= 100.00
+  if valid_positive_float?(num) && num.to_f() <= 100.00
     true
   else
     prompt(MESSAGES['valid_apr'])
+    false
   end
 end
 
@@ -114,7 +105,7 @@ loop do
     end
   end
 
-  months = time.to_i() * 12
+  months = time.to_f() * 12
   monthly = (apr.to_f() / 100) / 12
 
   # m = p * (j / (1 - (1 + j)**(-n)))
