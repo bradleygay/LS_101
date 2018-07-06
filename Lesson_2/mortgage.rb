@@ -67,6 +67,8 @@ loop do
     break
   end
 end
+
+name.strip!
 prompt("Hello, #{name}!")
 
 # --------------------------------------------------------
@@ -118,8 +120,17 @@ loop do
   prompt(MESSAGES['result'] + format('%0.2f', third_calculation) + ".")
 
   prompt(MESSAGES['again'])
-  answer = Kernel.gets().chomp()
-  break unless answer.downcase().start_with?("y")
+  answer = ""
+  loop do
+    answer = Kernel.gets().chomp()
+    if answer.downcase().start_with?("n")
+      return prompt(MESSAGES['goodbye'])
+    elsif answer.downcase().start_with?("y")
+      break
+    elsif answer.empty?()
+      prompt(MESSAGES['invalid_again'])
+    else
+      prompt(MESSAGES['invalid_again'])
+    end
+  end
 end
-
-prompt(MESSAGES['goodbye'])

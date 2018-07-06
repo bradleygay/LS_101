@@ -20,5 +20,6 @@ valid_apr: "Please enter a valid APR value: "
 
 result: "Your monthly mortgage payment will be $"
 
-again: "Would you like to continue with a different request? (Y to continue)"
+again: "Would you like to continue with a different request? (Y or N to continue)"
+invalid_again: "Please enter a valid operation. (Y or N to continue)"
 goodbye: "Thank you for stopping by. Have a magical day!"
