@@ -14,7 +14,9 @@ def prompt(message)
 end
 
 def valid_float?(num)
-  Float(num)
+    Float(num)
+  rescue ArgumentError
+    false
 end
 
 def valid_positive_float?(num)
@@ -22,31 +24,17 @@ def valid_positive_float?(num)
 end
 
 def valid_loan_amount?(num)
-  if valid_positive_float?(num)
-    true
-  else
-    prompt(MESSAGES['valid_number'])
-    false
-  end
+  valid_positive_float?(num) && num.to_f() >= 0.00
 end
 
 def valid_time?(num)
-  if valid_positive_float?(num)
-    true
-  else
-    prompt(MESSAGES['valid_number'])
-    false
-  end
+  valid_positive_float?(num)
 end
 
 def valid_apr?(num)
-  if valid_positive_float?(num) && num.to_f() <= 100.00
-    true
-  else
-    prompt(MESSAGES['valid_apr'])
-    false
-  end
+  valid_positive_float?(num) && num.to_f() <= 100.00
 end
+
 
 # --------------------------------------------------------
 
@@ -82,6 +70,8 @@ loop do
       prompt(MESSAGES['valid_number'])
     elsif valid_loan_amount?(loan_request)
       break
+    else 
+      prompt(MESSAGES['valid_number'])
     end
   end
 
@@ -93,6 +83,8 @@ loop do
       prompt(MESSAGES['valid_number'])
     elsif valid_time?(time)
       break
+    else
+      prompt(MESSAGES['valid_number'])
     end
   end
 
@@ -104,6 +96,8 @@ loop do
       prompt(MESSAGES['valid_apr'])
     elsif valid_apr?(apr)
       break
+    else
+      prompt(MESSAGES['valid_apr'])
     end
   end
 
@@ -116,8 +110,17 @@ loop do
   first_calculation = (1 + monthly)**-months
   second_calculation = monthly / (1 - first_calculation)
   third_calculation = loan_request.to_f() * second_calculation
+  zero_apr_calculation = loan_request.to_f() / months
 
-  prompt(MESSAGES['result'] + format('%0.2f', third_calculation) + ".")
+  loop do
+    if apr.to_f() > 0
+      prompt(MESSAGES['result'] + format('%0.2f', third_calculation) + ".")
+      break
+    else
+      prompt(MESSAGES['result'] + format('%0.2f', zero_apr_calculation) + ".")
+      break
+    end
+  end
 
   prompt(MESSAGES['again'])
   answer = ""

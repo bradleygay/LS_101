@@ -12,7 +12,7 @@ loan_request: |
 duration: "Great. And, what duration, in years, did you want this financing to continue?"
 apr_request: |
   Finally, what APR were your requesting today?
-  Please use a decimal value less than or equal to 100.
+  Please use a decimal value between 0.00 and 100.00.
 
 valid_name: "Please enter a valid name: "
 valid_number: "Please enter a valid numerical value: "
