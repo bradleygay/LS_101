@@ -1,25 +1,27 @@
-#Rock Paper Scissors Game
-#User enters choice
-#Computer enters choice
-#Winner is displayed
+# Rock Paper Scissors Game
+# User enters choice
+# Computer enters choice
+# Winner is displayed
 
 require 'yaml'
 MESSAGES = YAML.load_file('rps.yml')
 
-VALID_CHOICES = ['rock', 'paper', 'scissors']
+VALID_CHOICES = %w(rock paper scissors)
 
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
+def win?(first, second)
+  (first == 'rock' && second == 'scissors') ||
+    (first == 'paper' && second == 'rock') ||
+    (first == 'scissors' && second == 'paper')
+end
+
 def display_results(player, computer)
-  if (player == 'rock' && computer == 'scissors') ||
-      (player == 'paper' && computer == 'rock') ||
-        (player == 'scissors' && computer == 'paper')
+  if win?(player, computer)
     prompt(MESSAGES['win'])
-  elsif (player == 'rock' && computer == 'paper') ||
-          (player == 'paper' && computer == 'scissors') ||
-            (player == 'scissors' && computer == 'rock')
+  elsif win?(computer, player)
     prompt(MESSAGES['lose'])
   else
     prompt(MESSAGES['tie'])
@@ -47,7 +49,7 @@ loop do
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
     choice = Kernel.gets().chomp().downcase()
-    #Validate Input / Is choice one of the three values?
+    # Validate Input / Is choice one of the three values?
     if VALID_CHOICES.include?(choice)
       break
     else
