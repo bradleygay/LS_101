@@ -1,0 +1,15 @@
+# rps.yml
+
+name: "Please enter your name: "
+
+welcome: "Welcome to the Game of Rock, Paper, Scissors!"
+
+win: "You won!"
+lose: "The computer won!"
+tie: "You tied the computer."
+
+valid_name: "Please enter a valid name: "
+
+again: "Would you like to play again? (Y or N to continue)"
+invalid_again: "Please enter a valid operation. (Y or N to continue)"
+goodbye: "Thank you for playing. Have a magical day!"
