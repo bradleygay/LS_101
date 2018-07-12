@@ -1,4 +1,4 @@
-# Rock Paper Scissors Game
+# Rock Paper Scissors Lizard Spock Game
 # User enters choice
 # Computer enters choice
 # Winner is displayed
