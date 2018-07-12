@@ -8,17 +8,25 @@ MESSAGES = YAML.load_file('rps.yml')
 
 VALID_CHOICES = %w(rock paper scissors lizard spock)
 
+ABBREV_HASH = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'l' => 'lizard',
+  'sp' => 'spock'
+}
+
+WIN_HASH = {
+  'rock' => %w(scissors lizard),
+  'paper' => %w(rock spock),
+  'scissors' => %w(paper lizard),
+  'lizard' => %w(paper spock),
+  'spock' => %w(rock scissors)
+}
+
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
-
-WIN_HASH = {
-'rock' => %w(scissors lizard),
-'paper' => %w(rock spock),
-'scissors' => %w(paper lizard),
-'lizard' => %w(paper spock),
-'spock' => %w(rock scissors)
-}
 
 def win?(first, second)
   WIN_HASH[first].include?(second)
@@ -32,6 +40,11 @@ def result(player, computer)
   else
     prompt(MESSAGES['tie'])
   end
+end
+
+# Retrieve an item in hash through indexing (def [] defines method used when my_array["key"])
+def verify_abbrev(input)
+  ABBREV_HASH[input]
 end
 
 prompt(MESSAGES['name'])
@@ -54,8 +67,19 @@ loop do
   choice = ""
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+    options = <<-MSG
+    (r) for rock
+       (p) for paper
+       (sc) for scissors
+       (l) for lizard
+       (sp) for spock
+    MSG
+    prompt(options)
     choice = Kernel.gets().chomp().downcase()
     if VALID_CHOICES.include?(choice)
+      break
+    elsif
+      choice = verify_abbrev(choice)
       break
     else
       prompt("That is not a valid choice. Please make a new selection.")
