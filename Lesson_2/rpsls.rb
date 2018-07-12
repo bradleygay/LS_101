@@ -8,20 +8,19 @@ MESSAGES = YAML.load_file('rps.yml')
 
 VALID_CHOICES = %w(rock paper scissors lizard spock)
 
-ABBREV_HASH = {
-  'r' => 'rock',
-  'p' => 'paper',
-  'sc' => 'scissors',
-  'l' => 'lizard',
-  'sp' => 'spock'
-}
-
 WIN_HASH = {
   'rock' => %w(scissors lizard),
   'paper' => %w(rock spock),
   'scissors' => %w(paper lizard),
   'lizard' => %w(paper spock),
   'spock' => %w(rock scissors)
+}
+ABBREV_HASH = {
+  'r' => 'rock',
+  'p' => 'paper',
+  'sc' => 'scissors',
+  'l' => 'lizard',
+  'sp' => 'spock'
 }
 
 def prompt(message)
@@ -34,11 +33,22 @@ end
 
 def result(player, computer)
   if win?(player, computer)
-    prompt(MESSAGES['win'])
+    "Win"
   elsif win?(computer, player)
-    prompt(MESSAGES['lose'])
+    "Lose"
   else
-    prompt(MESSAGES['tie'])
+    "Tie"
+  end
+end
+
+def print_result(input)
+  case input
+  when "Win"
+    prompt("You won this round!")
+  when "Lose"
+    prompt("The computer won this round.")
+  when "Tie"
+    prompt("You tied the computer this round.")
   end
 end
 
@@ -64,30 +74,51 @@ prompt("Hello, #{name}!")
 prompt(MESSAGES['welcome'])
 
 loop do
-  choice = ""
+  user_wins = 0
+  computer_wins = 0
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
-    options = <<-MSG
-    (r) for rock
-       (p) for paper
-       (sc) for scissors
-       (l) for lizard
-       (sp) for spock
-    MSG
-    prompt(options)
-    choice = Kernel.gets().chomp().downcase()
-    if VALID_CHOICES.include?(choice) || (choice = verify_abbrev(choice))
-      break
-    else
-      prompt("That is not a valid choice. Please make a new selection.")
+    choice = ""
+    loop do
+      prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+      options = <<-MSG
+      (r) for rock
+         (p) for paper
+         (sc) for scissors
+         (l) for lizard
+         (sp) for spock
+      MSG
+      prompt(options)
+      choice = Kernel.gets().chomp().downcase()
+      if VALID_CHOICES.include?(choice) || (choice = verify_abbrev(choice))
+        break
+      else
+        prompt("That is not a valid choice. Please make a new selection.")
+      end
     end
+
+    computer_choice = VALID_CHOICES.sample().downcase()
+
+    prompt("You chose: #{choice}. The computer chose: #{computer_choice}.")
+
+    final = result(choice, computer_choice)
+    if final == "Win"
+      user_wins += 1
+    elsif final == "Lose"
+      computer_wins += 1
+    end
+
+    print_result(final)
+    prompt("Total User Wins: #{user_wins}")
+    prompt("Total Computer Wins: #{computer_wins}")
+
+    break if user_wins == 5 || computer_wins == 5
   end
 
-  computer_choice = VALID_CHOICES.sample().downcase()
-
-  Kernel.puts("You chose: #{choice}. The computer chose: #{computer_choice}.")
-
-  result(choice, computer_choice)
+  if user_wins == 5
+    prompt("You won the entire game!")
+  else
+    prompt("The computer won the game.")
+  end
 
   prompt(MESSAGES['again'])
   answer = ""
