@@ -42,7 +42,7 @@ def result(player, computer)
   end
 end
 
-# Retrieve an item in hash through indexing (def [] defines method used when my_array["key"])
+# Retrieve an item in hash through indexing
 def verify_abbrev(input)
   ABBREV_HASH[input]
 end
@@ -76,10 +76,7 @@ loop do
     MSG
     prompt(options)
     choice = Kernel.gets().chomp().downcase()
-    if VALID_CHOICES.include?(choice)
-      break
-    elsif
-      choice = verify_abbrev(choice)
+    if VALID_CHOICES.include?(choice) || (choice = verify_abbrev(choice))
       break
     else
       prompt("That is not a valid choice. Please make a new selection.")
