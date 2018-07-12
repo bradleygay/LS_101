@@ -20,8 +20,6 @@ WIN_HASH = {
 'spock' => %w(rock scissors)
 }
 
-p WIN_HASH
-
 def win?(first, second)
   WIN_HASH[first].include?(second)
 end
