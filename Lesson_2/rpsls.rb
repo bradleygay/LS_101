@@ -138,10 +138,8 @@ loop do
     prompt("Total User Wins: #{user_wins}")
     prompt("Total Computer Wins: #{computer_wins}")
 
-
     break if user_wins == WINNING_SCORE || computer_wins == WINNING_SCORE
   end
-  
   if user_wins == WINNING_SCORE
     prompt(MESSAGES['overall_win'])
   else
