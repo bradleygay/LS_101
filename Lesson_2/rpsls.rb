@@ -4,7 +4,9 @@
 # Winner is displayed
 
 require 'yaml'
-MESSAGES = YAML.load_file('rps.yml')
+MESSAGES = YAML.load_file('rpsls.yml')
+
+#--------------------------------------
 
 VALID_CHOICES = %w(rock paper scissors lizard spock)
 
@@ -22,6 +24,10 @@ ABBREV_HASH = {
   'l' => 'lizard',
   'sp' => 'spock'
 }
+
+WINNING_SCORE = 5
+
+#--------------------------------------
 
 def prompt(message)
   Kernel.puts("=> #{message}")
@@ -44,11 +50,11 @@ end
 def print_result(input)
   case input
   when "Win"
-    prompt("You won this round!")
+    prompt(MESSAGES['win'])
   when "Lose"
-    prompt("The computer won this round.")
+    prompt(MESSAGES['lose'])
   when "Tie"
-    prompt("You tied the computer this round.")
+    prompt(MESSAGES['tie'])
   end
 end
 
@@ -57,11 +63,30 @@ def verify_abbrev(input)
   ABBREV_HASH[input]
 end
 
+def play_again?
+  prompt(MESSAGES['again'])
+  answer = Kernel.gets().chomp().downcase()
+  if answer.start_with?("n")
+    return true
+  elsif answer.start_with?("y")
+    return false
+  else
+    prompt(MESSAGES['invalid_again'])
+  end
+  play_again?
+end
+
+def clear_screen
+  system("clear") || system("cls")
+end
+
+#--------------------------------------
+
 prompt(MESSAGES['name'])
 name = ""
 loop do
   name = Kernel.gets().chomp()
-  if name.empty?()
+  if name.empty?() || name.squeeze == ' '
     prompt(MESSAGES['valid_name'])
   else
     break
@@ -92,11 +117,13 @@ loop do
       if VALID_CHOICES.include?(choice) || (choice = verify_abbrev(choice))
         break
       else
-        prompt("That is not a valid choice. Please make a new selection.")
+        prompt(MESSAGES['valid_choice'])
       end
     end
 
     computer_choice = VALID_CHOICES.sample().downcase()
+
+    clear_screen
 
     prompt("You chose: #{choice}. The computer chose: #{computer_choice}.")
 
@@ -111,27 +138,17 @@ loop do
     prompt("Total User Wins: #{user_wins}")
     prompt("Total Computer Wins: #{computer_wins}")
 
-    break if user_wins == 5 || computer_wins == 5
-  end
 
-  if user_wins == 5
-    prompt("You won the entire game!")
+    break if user_wins == WINNING_SCORE || computer_wins == WINNING_SCORE
+  end
+  
+  if user_wins == WINNING_SCORE
+    prompt(MESSAGES['overall_win'])
   else
-    prompt("The computer won the game.")
+    prompt(MESSAGES['overall_lose'])
   end
 
-  prompt(MESSAGES['again'])
-  answer = ""
-  loop do
-    answer = Kernel.gets().chomp()
-    if answer.downcase().start_with?("n")
-      return prompt(MESSAGES['goodbye'])
-    elsif answer.downcase().start_with?("y")
-      break
-    elsif answer.empty?()
-      prompt(MESSAGES['invalid_again'])
-    else
-      prompt(MESSAGES['invalid_again'])
-    end
-  end
+  break if play_again?
 end
+
+prompt(MESSAGES['goodbye'])

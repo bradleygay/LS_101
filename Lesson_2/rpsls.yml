@@ -1,14 +1,20 @@
 # rpsls.yml
 
+win: "You won this round!"
+lose: "The computer won this round."
+tie: "You tied the computer this round."
+
+again: "Would you like to play again? (Y or N to continue)"
+invalid_again: "Please enter a valid operation. (Y or N to continue)"
+
 name: "Please enter your name: "
+valid_name: "Please enter a valid name: "
 
 welcome: "Welcome to the Game of Rock, Paper, Scissors!"
+
+valid_choice: "That is not a valid choice. Please make a new selection."
 
 overall_win: "You won the entire game!"
 overall_lose: "The computer won the entire game!"
 
-valid_name: "Please enter a valid name: "
-
-again: "Would you like to play again? (Y or N to continue)"
-invalid_again: "Please enter a valid operation. (Y or N to continue)"
 goodbye: "Thank you for playing. Have a magical day!"
