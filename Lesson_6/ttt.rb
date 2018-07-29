@@ -25,7 +25,7 @@ end
 
 def display_board(brd)
   system 'clear'
-  puts "You are using #{PLAYER_MARKER}'s. The computer is using #{COMPUTER_MARKER}'s."
+  puts "You are #{PLAYER_MARKER}'s. The computer is #{COMPUTER_MARKER}'s."
   puts ""
   puts "     |     |     "
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  "
@@ -83,10 +83,10 @@ def detect_winner(brd)
     if brd[arr[0]] == PLAYER_MARKER &&
        brd[arr[1]] == PLAYER_MARKER &&
        brd[arr[2]] == PLAYER_MARKER
-       return 'Player'
-     elsif brd[arr[0]] == COMPUTER_MARKER &&
-           brd[arr[1]] == COMPUTER_MARKER &&
-           brd[arr[2]] == COMPUTER_MARKER
+      return 'Player'
+    elsif brd[arr[0]] == COMPUTER_MARKER &&
+          brd[arr[1]] == COMPUTER_MARKER &&
+          brd[arr[2]] == COMPUTER_MARKER
       return 'Computer'
     end
   end
