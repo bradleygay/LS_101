@@ -18,11 +18,15 @@ require 'pry'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # Rows
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # Columns
+                [[1, 5, 9], [3, 5, 7]] # Diagonals
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
+# rubocop:disable Metrics/AbcSize
 def display_board(brd)
   system 'clear'
   puts "You are #{PLAYER_MARKER}'s. The computer is #{COMPUTER_MARKER}'s."
@@ -40,6 +44,7 @@ def display_board(brd)
   puts "     |     |     "
   puts ""
 end
+# rubocop:enable Metrics/AbcSize
 
 def initialize_board
   new_board = {}
@@ -76,17 +81,10 @@ def someone_won?(brd)
 end
 
 def detect_winner(brd)
-  winning_lines = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # Rows
-                  [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # Columns
-                  [[1, 5, 9], [3, 5, 7]] # Diagonals
-  winning_lines.each do |arr|
-    if brd[arr[0]] == PLAYER_MARKER &&
-       brd[arr[1]] == PLAYER_MARKER &&
-       brd[arr[2]] == PLAYER_MARKER
+  WINNING_LINES.each do |arr|
+    if brd.values_at(*arr).count(PLAYER_MARKER) == 3
       return 'Player'
-    elsif brd[arr[0]] == COMPUTER_MARKER &&
-          brd[arr[1]] == COMPUTER_MARKER &&
-          brd[arr[2]] == COMPUTER_MARKER
+    elsif brd.values_at(*arr).count(COMPUTER_MARKER) == 3
       return 'Computer'
     end
   end
