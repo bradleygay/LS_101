@@ -240,7 +240,7 @@ loop do
     end
     sleep 1
     prompt "The score is: Player #{player_wins}, Computer #{computer_wins}"
-    sleep 3
+    sleep 2.5
 
     if player_wins == 5 || computer_wins == 5
       prompt ">> GAME OVER <<"
