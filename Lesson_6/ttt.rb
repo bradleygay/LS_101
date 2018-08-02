@@ -21,14 +21,16 @@ COMPUTER_MARKER = 'O'
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # Rows
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # Columns
                 [[1, 5, 9], [3, 5, 7]] # Diagonals
+FIRST_PLAYER = 'Choose'
 
 def prompt(msg)
   puts "=> #{msg}"
 end
 
-# rubocop:disable Metrics/AbcSize
+# rubocop: disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd)
   system 'clear'
+  puts "Welcome to Tic-Tac-Toe."
   puts "You are #{PLAYER_MARKER}'s. The computer is #{COMPUTER_MARKER}'s."
   puts ""
   puts "     |     |     "
@@ -44,7 +46,7 @@ def display_board(brd)
   puts "     |     |     "
   puts ""
 end
-# rubocop:enable Metrics/AbcSize
+# rubocop: enable Metrics/MethodLength, Metrics/AbcSize
 
 def initialize_board
   new_board = {}
@@ -56,10 +58,51 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def joinor(arr, delimiter=', ', word='or')
+  case arr.size
+  when 1
+    arr.join
+  when 2
+    "#{arr[0]} #{word} #{arr[1]}"
+  when 3..9
+    arr[-1] = "#{word} #{arr.last} "
+    arr.join(delimiter)
+  end
+end
+
+def who_plays_first
+  prompt "Please determine who goes first; the computer (c) or the player (p)."
+  answer = ''
+  loop do
+    answer = gets.chomp.downcase
+    break if ['p', 'player', 'c', 'computer'].include?(answer)
+    prompt "Please pick again: 'p' for player or 'c' for computer."
+  end
+  case answer
+  when 'p' then 'Player'
+  when 'c' then 'Computer'
+  end
+end
+
+def first_player_assignment
+  case FIRST_PLAYER
+  when 'Player' then 'Player'
+  when 'Computer' then 'Computer'
+  when 'Choose' then who_plays_first
+  end
+end
+
+def next_player(current_player)
+  case current_player
+  when 'Player' then 'Computer'
+  when 'Computer' then 'Player'
+  end
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt "Choose a square (#{empty_squares(brd).join(', ')}): "
+    prompt "Choose a square: #{joinor(empty_squares(brd))}"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "That is not a valid choice. Please choose again."
@@ -68,8 +111,78 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+  # Offense
+  if computer_offense?(brd)
+    brd[comp_offense(brd)] = COMPUTER_MARKER
+  # Defense
+  elsif computer_defense?(brd)
+    brd[comp_defense(brd)] = COMPUTER_MARKER
+  # Square Five Available?
+  elsif brd[5] == INITIAL_MARKER
+    brd[5] = COMPUTER_MARKER
+  # Random
+  else
+    brd[empty_squares(brd).sample] = COMPUTER_MARKER
+  end
+end
+
+def computer_offense?(brd)
+  WINNING_LINES.each do |arr|
+    if brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 2 &&
+       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
+      return true
+    end
+  end
+  nil
+end
+
+def comp_offense(brd)
+  WINNING_LINES.each do |arr|
+    if brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 2 &&
+       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
+      arr.select do |square|
+        return square if empty_squares(brd).include?(square)
+      end
+    end
+    next
+  end
+  nil
+end
+
+def computer_defense?(brd)
+  WINNING_LINES.each do |arr|
+    if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 2 &&
+       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
+      return true
+    end
+  end
+  nil
+end
+
+def comp_defense(brd)
+  WINNING_LINES.each do |arr|
+    if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 2 &&
+       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
+      arr.select do |square|
+        return square if empty_squares(brd).include?(square)
+      end
+    end
+    next
+  end
+  nil
+end
+
+def computer_ai(arr, brd, mark)
+  if brd.values_at(arr[0], arr[1], arr[2]).count(mark) == 2
+    brd.select { |k, v| arr.include?(k) && v == INITIAL_MARKER }.keys.first
+  end
+end
+
+def place_piece!(brd, current_player)
+  case current_player
+  when 'Player' then player_places_piece!(brd)
+  when 'Computer' then computer_places_piece!(brd)
+  end
 end
 
 def board_full?(brd)
@@ -82,34 +195,62 @@ end
 
 def detect_winner(brd)
   WINNING_LINES.each do |arr|
-    if brd.values_at(*arr).count(PLAYER_MARKER) == 3
+    if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 3
       return 'Player'
-    elsif brd.values_at(*arr).count(COMPUTER_MARKER) == 3
+    elsif brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 3
       return 'Computer'
     end
   end
   nil # Nobody has won yet
 end
 
+#-------------
+
 loop do
+  player_wins = 0
+  computer_wins = 0
   board = initialize_board
-
-  loop do
-    display_board(board)
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-  end
-
-  # Break twice in order to prevent order of precedence confusion
-  # While iterating over detect_winner method
-
   display_board(board)
-  if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
-  else
-    prompt "It's a tie!"
+  first_player = first_player_assignment
+  loop do
+    board = initialize_board
+    current_player = first_player
+    loop do
+      display_board(board)
+      place_piece!(board, current_player)
+      current_player = next_player(current_player)
+      break if someone_won?(board) || board_full?(board)
+    end
+
+    # Break twice in order to prevent order of precedence confusion
+    # While iterating over detect_winner method
+
+    display_board(board)
+    if someone_won?(board)
+      prompt "#{detect_winner(board)} won!"
+    else
+      prompt "Stalemate."
+    end
+
+    if detect_winner(board) == 'Player'
+      player_wins += 1
+    end
+    if detect_winner(board) == 'Computer'
+      computer_wins += 1
+    end
+    sleep 1
+    prompt "The score is: Player #{player_wins}, Computer #{computer_wins}"
+    sleep 3
+
+    if player_wins == 5 || computer_wins == 5
+      prompt ">> GAME OVER <<"
+      if player_wins == 5
+        prompt "You Won!"
+      else
+        prompt "The Computer Won."
+      end
+      break
+    end
   end
 
   prompt "Would you like to play again? (Y or N)"
