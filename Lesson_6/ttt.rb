@@ -13,8 +13,6 @@
 # => 9  User Input; If Yes, Loop again; Display 3x3 Board (Go to 1)
 # => 10 User Input; If No, Goodbye!
 
-require 'pry'
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -112,11 +110,11 @@ end
 
 def computer_places_piece!(brd)
   # Offense
-  if computer_offense?(brd)
-    brd[comp_offense(brd)] = COMPUTER_MARKER
+  if attack(brd)
+    brd[attack(brd)] = COMPUTER_MARKER
   # Defense
-  elsif computer_defense?(brd)
-    brd[comp_defense(brd)] = COMPUTER_MARKER
+  elsif defend(brd)
+    brd[defend(brd)] = COMPUTER_MARKER
   # Square Five Available?
   elsif brd[5] == INITIAL_MARKER
     brd[5] = COMPUTER_MARKER
@@ -126,21 +124,11 @@ def computer_places_piece!(brd)
   end
 end
 
-def computer_offense?(brd)
+def attack(brd)
   WINNING_LINES.each do |arr|
     if brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 2 &&
        brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
-      return true
-    end
-  end
-  nil
-end
-
-def comp_offense(brd)
-  WINNING_LINES.each do |arr|
-    if brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 2 &&
-       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
-      arr.select do |square|
+      then arr.select do |square|
         return square if empty_squares(brd).include?(square)
       end
     end
@@ -149,21 +137,11 @@ def comp_offense(brd)
   nil
 end
 
-def computer_defense?(brd)
+def defend(brd)
   WINNING_LINES.each do |arr|
     if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 2 &&
        brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
-      return true
-    end
-  end
-  nil
-end
-
-def comp_defense(brd)
-  WINNING_LINES.each do |arr|
-    if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 2 &&
-       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
-      arr.select do |square|
+      then arr.select do |square|
         return square if empty_squares(brd).include?(square)
       end
     end
@@ -204,6 +182,24 @@ def detect_winner(brd)
   nil # Nobody has won yet
 end
 
+def enter_to_continue
+  prompt "Please press <Enter> to continue."
+  gets.chomp
+end
+
+def play_again?
+  prompt "Would you like to play again? (Y or N)"
+  answer = gets.chomp
+  if answer.downcase.start_with?('y')
+    return false
+  elsif answer.downcase.start_with?('n')
+    return true
+  else
+    prompt "Invalid input. Please enter 'y' or 'n' to continue."
+  end
+  play_again?
+end
+
 #-------------
 
 loop do
@@ -222,9 +218,6 @@ loop do
       break if someone_won?(board) || board_full?(board)
     end
 
-    # Break twice in order to prevent order of precedence confusion
-    # While iterating over detect_winner method
-
     display_board(board)
     if someone_won?(board)
       prompt "#{detect_winner(board)} won!"
@@ -238,9 +231,8 @@ loop do
     if detect_winner(board) == 'Computer'
       computer_wins += 1
     end
-    sleep 1
     prompt "The score is: Player #{player_wins}, Computer #{computer_wins}"
-    sleep 2.5
+    enter_to_continue
 
     if player_wins == 5 || computer_wins == 5
       prompt ">> GAME OVER <<"
@@ -253,9 +245,7 @@ loop do
     end
   end
 
-  prompt "Would you like to play again? (Y or N)"
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break if play_again?
 end
 
 prompt "Thanks for playing. Goodbye."
