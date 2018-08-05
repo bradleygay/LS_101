@@ -97,6 +97,14 @@ def next_player(current_player)
   end
 end
 
+def center_square(brd)
+  5 if brd[5] == INITIAL_MARKER
+end
+
+def random_square(brd)
+  empty_squares(brd).sample
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -110,36 +118,27 @@ end
 
 def computer_places_piece!(brd)
   # Offense
-  if attack(brd)
-    brd[attack(brd)] = COMPUTER_MARKER
+  move = attack(brd)
   # Defense
-  elsif defend(brd)
-    brd[defend(brd)] = COMPUTER_MARKER
+  move = defend(brd) unless move
   # Square Five Available?
-  elsif brd[5] == INITIAL_MARKER
-    brd[5] = COMPUTER_MARKER
+  move = center_square(brd) unless move
   # Random
-  else
-    brd[empty_squares(brd).sample] = COMPUTER_MARKER
-  end
+  move = random_square(brd) unless move
+  brd[move] = COMPUTER_MARKER
 end
 
 def attack(brd)
-  WINNING_LINES.each do |arr|
-    if brd.values_at(arr[0], arr[1], arr[2]).count(COMPUTER_MARKER) == 2 &&
-       brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
-      then arr.select do |square|
-        return square if empty_squares(brd).include?(square)
-      end
-    end
-    next
-  end
-  nil
+  best_play(brd, COMPUTER_MARKER)
 end
 
 def defend(brd)
+  best_play(brd, PLAYER_MARKER)
+end
+
+def best_play(brd, marker)
   WINNING_LINES.each do |arr|
-    if brd.values_at(arr[0], arr[1], arr[2]).count(PLAYER_MARKER) == 2 &&
+    if brd.values_at(arr[0], arr[1], arr[2]).count(marker) == 2 &&
        brd.values_at(arr[0], arr[1], arr[2]).count(INITIAL_MARKER) == 1
       then arr.select do |square|
         return square if empty_squares(brd).include?(square)
