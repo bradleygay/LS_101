@@ -23,6 +23,8 @@ DEALER_STANDS = 17
 
 BLACKJACK = 21
 
+GAME_LIMIT = 5
+
 def prompt(msg)
   p "=> #{msg}"
 end
@@ -34,7 +36,7 @@ def welcome
 end
 
 def ready?
-  p "Are you ready to play? (Y/N)"
+  prompt "Are you ready to play? (Y/N)"
   answer = gets.chomp
   if answer.downcase.start_with?('y')
     return false
@@ -42,7 +44,7 @@ def ready?
     p "Thank you. Come back when you are ready to play. Goodbye."
     exit
   else
-    p "Invalid input. Please enter 'y' or 'n' to continue."
+    prompt "Invalid input. Please enter 'y' or 'n' to continue."
   end
   ready?
 end
@@ -70,7 +72,6 @@ def deal(deck, player_hand, dealer_hand)
   puts ""
   p "Player >> #{join(player_hand)}"
   p "Dealer >> <UNKNOWN> | #{dealer_hand[1].join(' of ')}"
-  puts ""
 end
 
 def join(hand, word = " of ")
@@ -89,9 +90,10 @@ def player_move(deck, player_hand)
     answer = hit_stay?
     if answer == "h"
       player_hand << random_draw(deck)
-      prompt "Player Hit: #{player_hand[-1].join(' of ')}"
-      prompt "Player Cards: #{join(player_hand)}"
-      prompt "Total Card Value: #{total(player_hand)}"
+      p "Player Hit: #{player_hand[-1].join(' of ')}"
+      p "Player Cards: #{join(player_hand)}"
+      p "Total Card Value: #{total(player_hand)}"
+      puts ""
     end
     break if answer == "s" || busted?(player_hand)
   end
@@ -101,9 +103,11 @@ def dealer_move(deck, dealer_hand)
   loop do
     break if total(dealer_hand) >= DEALER_STANDS
     dealer_hand << random_draw(deck)
-    prompt "Dealer Hit: #{dealer_hand[-1].join(' of ')}"
-    prompt "Dealer Cards: #{join(dealer_hand)}"
-    prompt "Total Card Value: #{total(dealer_hand)}"
+    sleep 1
+    p "Dealer Hit: #{dealer_hand[-1].join(' of ')}"
+    p "Dealer Cards: #{join(dealer_hand)}"
+    p "Total Card Value: #{total(dealer_hand)}"
+    puts ""
   end
 end
 
@@ -124,6 +128,8 @@ end
 def hit_stay?
   answer = ""
   loop do
+    sleep 1
+    puts ""
     prompt "Do you want to hit (h) or stay (s)?"
     answer = gets.chomp.downcase
     break if answer.include?('h') || answer.include?('s')
@@ -139,25 +145,32 @@ end
 def result?(player_hand, dealer_hand)
   player_total = total(player_hand)
   dealer_total = total(dealer_hand)
-  return :player_bust if busted?(player_hand)
-  return :dealer_bust if busted?(dealer_hand)
-  return :player if player_total > dealer_total
-  return :dealer if player_total < dealer_total
-  return :tie if player_total == dealer_total
+  if busted?(player_hand)
+    :player_bust
+  elsif busted?(dealer_hand)
+    :dealer_bust
+  elsif player_total > dealer_total
+    :player
+  elsif player_total < dealer_total
+    :dealer
+  elsif player_total == dealer_total
+    :tie
+  end
 end
 
 def winner(player_hand, dealer_hand)
   who_won = result?(player_hand, dealer_hand)
   case who_won
-  when :player_bust then prompt "Busted. Dealer wins this hand."
-  when :dealer_bust then prompt "Dealer busted. You win this hand!"
-  when :player then prompt "You win this hand!"
-  when :dealer then prompt "The Dealer wins this hand."
-  when :tie then prompt "Stalemate."
+  when :player_bust then p "Busted. Dealer wins this hand."
+  when :dealer_bust then p "Dealer busted. You win this hand!"
+  when :player then p "You win this hand!"
+  when :dealer then p "The Dealer wins this hand."
+  when :tie then p "Stalemate."
   end
 end
 
 def play_again?
+  sleep 1
   puts ""
   prompt "Would you like to play again? (Y or N)"
   answer = gets.chomp
@@ -175,6 +188,8 @@ end
 
 welcome
 ready?
+player_score = 0
+dealer_score = 0
 loop do
   deck = initialize_deck
   player_cards = []
@@ -183,8 +198,21 @@ loop do
   player_move(deck, player_cards)
   dealer_move(deck, dealer_cards) unless busted?(player_cards)
   winner(player_cards, dealer_cards)
+
+  result = result?(player_cards, dealer_cards)
+  player_score += 1 if result == :dealer_bust || result == :player
+  dealer_score += 1 if result == :player_bust || result == :dealer
+  p "Player Score: #{player_score} | Dealer Score: #{dealer_score}"
+
+  if player_score == GAME_LIMIT
+    puts ""
+    p "PLAYER WINS THE GAME!"
+  elsif dealer_score == GAME_LIMIT
+    puts ""
+    p "Dealer Wins the Game."
+  end
+
   break if play_again?
 end
 
-prompt "Thank you for playing Blackjack!"
-prompt "Goodbye."
+p "Thank you for playing Blackjack! Goodbye."
