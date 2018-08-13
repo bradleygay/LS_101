@@ -15,10 +15,6 @@
 # => 11 If Yes, Loop Again (3)
 # => 12 If No, Exit Loop and Goodbye.
 
-CARD_VALUES = { "2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6,
-                "7" => 7, "8" => 8, "9" => 9, "10" => 10, "J" => 10,
-                "Q" => 10, "K" => 10 }
-
 DEALER_STANDS = 17
 
 BLACKJACK = 21
@@ -36,11 +32,13 @@ def welcome
 end
 
 def ready?
-  prompt "Are you ready to play? (Y/N)"
-  answer = gets.chomp
-  if answer.downcase.start_with?('y')
-    return false
-  elsif answer.downcase.start_with?('n')
+  prompt "Are you ready to play?"
+  answer = gets.chomp.downcase
+  if answer.start_with?('y')
+    best_of_five
+    sleep 3
+    return
+  elsif answer.start_with?('n')
     p "Thank you. Come back when you are ready to play. Goodbye."
     exit
   else
@@ -59,6 +57,14 @@ end
 
 def random_draw(deck)
   deck.pop
+end
+
+def best_of_five
+  p "Fantastic! Best of Five Hands wins the Game!"
+end
+
+def new_round
+  p "Next round. First player to reach #{GAME_LIMIT} point wins the game!"
 end
 
 def deal(deck, player_hand, dealer_hand)
@@ -87,7 +93,7 @@ end
 
 def player_move(deck, player_hand)
   loop do
-    answer = hit_stay?
+    answer = hit_stay
     if answer == "h"
       player_hand << random_draw(deck)
       p "Player Hit: #{player_hand[-1].join(' of ')}"
@@ -125,14 +131,18 @@ def total(hand)
   total
 end
 
-def hit_stay?
+def valid_answer?(array, input)
+  array.include?(input)
+end
+
+def hit_stay
   answer = ""
   loop do
     sleep 1
     puts ""
     prompt "Do you want to hit (h) or stay (s)?"
     answer = gets.chomp.downcase
-    break if answer.include?('h') || answer.include?('s')
+    break if valid_answer?(["h", "s"], answer)
     p "Invalid entry. Please enter 'h' or 's' to proceed."
   end
   answer
@@ -142,7 +152,7 @@ def busted?(hand)
   total(hand) > BLACKJACK
 end
 
-def result?(player_hand, dealer_hand)
+def result(player_hand, dealer_hand)
   player_total = total(player_hand)
   dealer_total = total(dealer_hand)
   if busted?(player_hand)
@@ -158,8 +168,8 @@ def result?(player_hand, dealer_hand)
   end
 end
 
-def winner(player_hand, dealer_hand)
-  who_won = result?(player_hand, dealer_hand)
+def display_winner(player_hand, dealer_hand)
+  who_won = result(player_hand, dealer_hand)
   case who_won
   when :player_bust then p "Busted. Dealer wins this hand."
   when :dealer_bust then p "Dealer busted. You win this hand!"
@@ -173,10 +183,10 @@ def play_again?
   sleep 1
   puts ""
   prompt "Would you like to play again? (Y or N)"
-  answer = gets.chomp
-  if answer.downcase.start_with?('y')
+  answer = gets.chomp.downcase
+  if answer.start_with?('y')
     return false
-  elsif answer.downcase.start_with?('n')
+  elsif answer.start_with?('n')
     return true
   else
     prompt "Invalid input. Please enter 'y' or 'n' to continue."
@@ -186,24 +196,31 @@ end
 
 #-------------
 
-welcome
-ready?
-player_score = 0
-dealer_score = 0
 loop do
-  deck = initialize_deck
-  player_cards = []
-  dealer_cards = []
-  deal(deck, player_cards, dealer_cards)
-  player_move(deck, player_cards)
-  dealer_move(deck, dealer_cards) unless busted?(player_cards)
-  winner(player_cards, dealer_cards)
+  welcome
+  ready?
+  player_score = 0
+  dealer_score = 0
 
-  result = result?(player_cards, dealer_cards)
-  player_score += 1 if result == :dealer_bust || result == :player
-  dealer_score += 1 if result == :player_bust || result == :dealer
-  p "Player Score: #{player_score} | Dealer Score: #{dealer_score}"
+  loop do
+    new_round
+    deck = initialize_deck
+    player_cards = []
+    dealer_cards = []
+    deal(deck, player_cards, dealer_cards)
+    player_move(deck, player_cards)
+    dealer_move(deck, dealer_cards) unless busted?(player_cards)
+    display_winner(player_cards, dealer_cards)
 
+    loop_result = result(player_cards, dealer_cards)
+    player_score += 1 if loop_result == :dealer_bust || loop_result == :player
+    dealer_score += 1 if loop_result == :player_bust || loop_result == :dealer
+    sleep 3
+    system 'clear'
+    p "Player Score: #{player_score} | Dealer Score: #{dealer_score}"
+    sleep 4
+    break if player_score == GAME_LIMIT || dealer_score == GAME_LIMIT
+  end
   if player_score == GAME_LIMIT
     puts ""
     p "PLAYER WINS THE GAME!"
@@ -211,7 +228,6 @@ loop do
     puts ""
     p "Dealer Wins the Game."
   end
-
   break if play_again?
 end
 
