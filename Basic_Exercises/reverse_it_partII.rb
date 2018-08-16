@@ -5,7 +5,3 @@ def reverse_words(string)
   end
   arr.join(" ")
 end
-
-p reverse_words("Antidisestablishmentarianism")
-p reverse_words("I know you are but what am I")
-p reverse_words("I am the walrus")

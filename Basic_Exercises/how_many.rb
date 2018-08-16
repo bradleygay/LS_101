@@ -7,5 +7,3 @@ def count_occurrences(arr)
     p "#{k} => #{v}"
   end
 end
-
-count_occurrences([1, 2, 3, 4, 2, 3, 1])
