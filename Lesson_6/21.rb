@@ -25,9 +25,18 @@ def prompt(msg)
   p "=> #{msg}"
 end
 
+def print_in_box(str)
+  length = str.length + 2
+  p "+#{''.center(length, '-')}+"
+  p "|#{''.center(length, ' ')}|"
+  p "|#{str.center(length, ' ')}|"
+  p "|#{''.center(length, ' ')}|"
+  p "+#{''.center(length, '-')}+"
+end
+
 def welcome
   system 'clear'
-  p "W E L C O M E  T O  B L A C K J A C K"
+  print_in_box("W E L C O M E  T O  B L A C K J A C K")
   sleep 0.5
 end
 
